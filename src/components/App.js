@@ -9,16 +9,30 @@ import EditAvatarPopup from './EditAvatarPopup.js';
 import EditPlacePopup from './AddPlacePopup.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 import api from '../utils/Api.js';
+import apiAuth from '../utils/ApiAuth.js';
+import { Route, Routes, Navigate, useNavigate} from 'react-router-dom';
+import Login from './Login.js';
+import Register from './Register.js';
+import ProtectedRoute from './ProtectedRoute.js';
+import InfoTooltip from './InfoTooltip.js'
 
 function App() {
+  const navigate = useNavigate();
 
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =  React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({name: '', link: ''});
+  const [isAddInfoTooltipPopupOpen, setIsAddInfoTooltipPopupOpen] = React.useState(false);
+  const [popupType, setPopupType] = React.useState();
   
+  const [selectedCard, setSelectedCard] = React.useState({name: '', link: ''});
+
   const [currentUser, setCurrentUser] = React.useState({name: '', avatar: '', about: ''});
   const [cards, setCards] = React.useState([]);
+  const [email, setEmail] = React.useState("");
+
+  
+  const [loggedIn, setLoggedIn] = React.useState(false);
 
   //Читаем данные из запроса по API
   React.useEffect(() => {
@@ -28,6 +42,10 @@ function App() {
       setCards(cards);
     })
     .catch(err => console.log(`Ошибка инициализации данных: ${err}`));
+  }, []);
+
+  React.useEffect(() => {
+    tokenCheck();
   }, []);
 
   // Cекция реализует открытие и закрытие попап форм
@@ -93,6 +111,55 @@ function App() {
     .catch(err => console.log(`Ошибка создания карточки: ${err}`));
   }
 
+  function handleUpdateUserRegister(userAuth){
+    apiAuth.register(userAuth)
+    .then((res) => {
+      if(res){
+        setIsAddInfoTooltipPopupOpen('accept')
+        navigate('/sign-in')
+      } else {
+        console.log("Что-то пошло не так!")
+      }
+    })
+    .catch(err => console.log(`Ошибка регистрации: ${err}`));
+  }
+
+  function handleUpdateUserLogin(userAuth){
+    apiAuth.auth(userAuth)
+    .then((authData) => {
+      if (authData.token){
+        localStorage.setItem('token', authData.token);
+        setLoggedIn(true)
+        navigate('/')
+      }
+    })
+    .catch(err => {
+      setPopupType('decline')
+      setIsAddInfoTooltipPopupOpen(true)
+      return console.log(`Ошибка авторизации: ${err}`)}
+    );
+  }
+
+  function tokenCheck() {
+    const token = localStorage.getItem('token');
+    // если у пользователя есть токен в localStorage,
+    // эта функция проверит валидность токена
+    if (token){
+      // проверим токен
+      apiAuth.emailInfo(token).then((res) => {
+        if (res){
+          // авторизуем пользователя
+          setLoggedIn(true)
+          navigate('/')
+          setEmail(res.data.email)
+        }
+      })
+      .catch(err => {
+        return console.log(`Неудалось проверить токен: ${err}`)}
+      ); 
+    }
+  } 
+
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
   }
@@ -109,6 +176,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsAddInfoTooltipPopupOpen(false);
     setSelectedCard({name: '', link: ''});
   }
 
@@ -117,28 +185,46 @@ function App() {
     setSelectedCard(card);
   }
 
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <div className="App">
-        <div className="page">
-          <Header />
-          <Main 
-          onEditProfile = {handleEditProfileClick}
-          onAddPlace = {handleAddPlaceClick}
-          onEditAvatar = {handleEditAvatarClick}
-          onCardClick = {handleCardClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
-          cards={cards}
-          />
-          <Footer />
-        </div>
-        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/> 
-        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
-        <EditPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlaceSubmit={handleAddPlaceSubmit}/>
-        <PopupWithForm name="add-card" title="Вы уверены?" buttonTitle="Да" theme="popup__button_theme_delete-card">
-        </PopupWithForm>
-        <ImagePopup selectedCard={selectedCard} onClose={closeAllPopups}/>
+          <div className="page">
+            <Routes>
+              <Route path="/" element = {
+                <>
+                  <Header title="Выйти" link="sign-in" userEmail={true} email={email}/>
+                  <ProtectedRoute
+                    path="/"
+                    loggedIn={loggedIn}
+                    component={Main}  
+                    onEditProfile = {handleEditProfileClick}
+                    onAddPlace = {handleAddPlaceClick}
+                    onEditAvatar = {handleEditAvatarClick}
+                    onCardClick = {handleCardClick}
+                    onCardLike={handleCardLike}
+                    onCardDelete={handleCardDelete}
+                    cards={cards}
+                    email={email}/>
+                  <Footer />
+                </>}/>
+              <Route path="/sign-up" element = {
+              <>
+                <Header title="Войти" link="/sign-in"/>
+                <Register onUpdateUserAuth={handleUpdateUserRegister}/>
+              </>} />
+              <Route path="/sign-in" element = {
+              <>
+                <Header title="Регистрация" link="/sign-up"/>
+                <Login onUpdateUserAuth={handleUpdateUserLogin}/>
+              </>} />
+              <Route exact path="*" element = {loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />} />
+            </Routes>
+          <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/> 
+          <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
+          <EditPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlaceSubmit={handleAddPlaceSubmit}/>
+          <PopupWithForm name="add-card" title="Вы уверены?" buttonTitle="Да" theme="popup__button_theme_delete-card"/>
+          <InfoTooltip popupType={popupType} isOpen={isAddInfoTooltipPopupOpen} onClose={closeAllPopups}/>
+          <ImagePopup selectedCard={selectedCard} onClose={closeAllPopups}/>
       </div>
     </CurrentUserContext.Provider>
   );

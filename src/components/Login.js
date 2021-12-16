@@ -1,6 +1,8 @@
-function Login() {
+import PageForm from './PageForm.js';
+
+function Login(props) {
   return (
-    <div>Hello I am a Login page!</div>
+      <PageForm header="Вход" button="Войти" onUpdateUserAuth={props.onUpdateUserAuth}/>
     );
   }
   
