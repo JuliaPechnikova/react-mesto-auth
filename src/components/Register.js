@@ -1,9 +1,10 @@
 import PageForm from './PageForm.js';
+import { Link } from 'react-router-dom';
 
 function Register(props) {
   return (
       <PageForm header="Регистрация" button="Зарегистрироваться" onUpdateUserAuth={props.onUpdateUserAuth}>
-        <a className="page-form__caption" href="/sign-in">Уже зарегистрированы? Войти</a>
+        <Link className="page-form__caption" to="/sign-in">Уже зарегистрированы? Войти</Link>
       </PageForm>
     );
   }

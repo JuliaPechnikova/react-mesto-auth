@@ -5,7 +5,7 @@ class Api {
     this._headers = content.headers;
   }
 
-  serverResponseChecker(res){
+  _checkResponse(res){
     if (res.ok) {
       return res.json();
     }
@@ -18,7 +18,7 @@ class Api {
       method: 'GET',
       headers: this._headers
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   setCard(cardLink, cardName){
@@ -30,7 +30,7 @@ class Api {
         name: cardName
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   getUserInfo(){
@@ -38,7 +38,7 @@ class Api {
       method: 'GET',
       headers: this._headers
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   getAllInfo(){
@@ -54,7 +54,7 @@ class Api {
         about: profileDescription
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   putCardLikes(cardID) {
@@ -65,7 +65,7 @@ class Api {
         _id: cardID
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   deleteCardLikes(likeID) {
@@ -76,7 +76,7 @@ class Api {
         _id: likeID
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   setUserAvatar(userPhoto) {
@@ -87,7 +87,7 @@ class Api {
         avatar: userPhoto
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   deleteCard(cardID) {
@@ -98,7 +98,7 @@ class Api {
         _id: cardID
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 }
 

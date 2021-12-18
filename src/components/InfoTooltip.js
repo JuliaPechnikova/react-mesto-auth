@@ -5,7 +5,7 @@ import editFormImage from '../images/edit-form-image.svg';
 const acceptMessage = "Вы успешно зарегистировались!";
 const declineMessage = "Что-то пошло не так! Попробуйте ещё раз.";
 
-function PopupWithForm(props) {
+function InfoTooltip(props) {
   return (
     <div className={`popup popup_${props.name} ${props.isOpen ? 'popup_opened' : ''}`}>
     <div className="popup__container popup__container_alert">
@@ -19,4 +19,4 @@ function PopupWithForm(props) {
   );
 }
 
-export default PopupWithForm;
+export default InfoTooltip;

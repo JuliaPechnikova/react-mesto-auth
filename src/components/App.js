@@ -78,7 +78,7 @@ function App() {
     if (isOwn === true) {
       api.deleteCard(card._id, isOwn)
       .then(() => {
-        setCards(cards.filter((c) => c !== card));
+        setCards((state) => state.filter((c) => c._id !== card._id));
       })
       .catch(err => console.log(`Ошибка удаления карточки: ${err}`));
     }
@@ -115,13 +115,18 @@ function App() {
     apiAuth.register(userAuth)
     .then((res) => {
       if(res){
-        setIsAddInfoTooltipPopupOpen('accept')
-        navigate('/sign-in')
+        setPopupType('accept');
+        setIsAddInfoTooltipPopupOpen(true);
+        navigate('/sign-in');
       } else {
-        console.log("Что-то пошло не так!")
+        console.log("Что-то пошло не так!");
       }
     })
-    .catch(err => console.log(`Ошибка регистрации: ${err}`));
+    .catch(err => {
+      setPopupType('decline');
+      setIsAddInfoTooltipPopupOpen(true);
+      return console.log(`Ошибка регистрации: ${err}`);
+    });
   }
 
   function handleUpdateUserLogin(userAuth){
@@ -129,15 +134,16 @@ function App() {
     .then((authData) => {
       if (authData.token){
         localStorage.setItem('token', authData.token);
-        setLoggedIn(true)
-        navigate('/')
+        setLoggedIn(true);
+        setEmail(userAuth.login);
+        navigate('/');
       }
     })
     .catch(err => {
-      setPopupType('decline')
-      setIsAddInfoTooltipPopupOpen(true)
-      return console.log(`Ошибка авторизации: ${err}`)}
-    );
+      setPopupType('decline');
+      setIsAddInfoTooltipPopupOpen(true);
+      return console.log(`Ошибка авторизации: ${err}`);
+    });
   }
 
   function tokenCheck() {
@@ -149,9 +155,9 @@ function App() {
       apiAuth.emailInfo(token).then((res) => {
         if (res){
           // авторизуем пользователя
-          setLoggedIn(true)
-          navigate('/')
-          setEmail(res.data.email)
+          setLoggedIn(true);
+          navigate('/');
+          setEmail(res.data.email);
         }
       })
       .catch(err => {
@@ -179,6 +185,16 @@ function App() {
     setIsAddInfoTooltipPopupOpen(false);
     setSelectedCard({name: '', link: ''});
   }
+
+  React.useEffect(() => {
+    const closeByEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+    document.addEventListener('keydown', closeByEscape)
+    return () => document.removeEventListener('keydown', closeByEscape)
+  }, [])
 
   //Открытие попап с картинкой
   const handleCardClick = (card) => {

@@ -4,7 +4,7 @@ class ApiAuth {
     this._headers = content.headers;
   }
 
-  serverResponseChecker(res){
+  _checkResponse(res){
     if (res.ok) {
       return res.json();
     }
@@ -21,7 +21,7 @@ class ApiAuth {
         email: userData.login
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   auth(userData) {
@@ -33,7 +33,7 @@ class ApiAuth {
         email: userData.login
       })
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 
   emailInfo(jwt) {
@@ -44,7 +44,7 @@ class ApiAuth {
         'Authorization' : `Bearer ${jwt}`
       }
     })
-    .then(this.serverResponseChecker)
+    .then(this._checkResponse)
   }
 }
 
