@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Register(props) {
   return (
       <PageForm header="Регистрация" button="Зарегистрироваться" onUpdateUserAuth={props.onUpdateUserAuth}>
-        <Link className="page-form__caption" to="/sign-in">Уже зарегистрированы? Войти</Link>
+        <Link className="page-form__caption" to="/signin">Уже зарегистрированы? Войти</Link>
       </PageForm>
     );
   }

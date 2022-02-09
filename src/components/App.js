@@ -117,7 +117,7 @@ function App() {
       if(res){
         setPopupType('accept');
         setIsAddInfoTooltipPopupOpen(true);
-        navigate('/sign-in');
+        navigate('/signin');
       } else {
         console.log("Что-то пошло не так!");
       }
@@ -208,7 +208,7 @@ function App() {
             <Routes>
               <Route path="/" element = {
                 <>
-                  <Header title="Выйти" link="sign-in" userEmail={true} email={email}/>
+                  <Header title="Выйти" link="signin" userEmail={true} email={email}/>
                   <ProtectedRoute
                     path="/"
                     loggedIn={loggedIn}
@@ -223,17 +223,17 @@ function App() {
                     email={email}/>
                   <Footer />
                 </>}/>
-              <Route path="/sign-up" element = {
+              <Route path="/signup" element = {
               <>
-                <Header title="Войти" link="/sign-in"/>
+                <Header title="Войти" link="/signin"/>
                 <Register onUpdateUserAuth={handleUpdateUserRegister}/>
               </>} />
-              <Route path="/sign-in" element = {
+              <Route path="/signin" element = {
               <>
-                <Header title="Регистрация" link="/sign-up"/>
+                <Header title="Регистрация" link="/signup"/>
                 <Login onUpdateUserAuth={handleUpdateUserLogin}/>
               </>} />
-              <Route exact path="*" element = {loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />} />
+              <Route exact path="*" element = {loggedIn ? <Navigate to="/" /> : <Navigate to="/signin" />} />
             </Routes>
           <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/> 
           <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
