@@ -103,9 +103,9 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-29/',
+  baseUrl: 'https://api.juliape4nikova.nomoredomains.work',
   headers: {
-    'authorization': 'f941cb39-a05b-48d7-86db-8f1e836b871d',
+    //'authorization': 'f941cb39-a05b-48d7-86db-8f1e836b871d',
     'Content-Type': 'application/json'
   }
 });

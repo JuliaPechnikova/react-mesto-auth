@@ -49,7 +49,7 @@ class ApiAuth {
 }
 
 const apiAuth = new ApiAuth({
-  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: 'https://api.juliape4nikova.nomoredomains.work',
   headers: {
     'Content-Type': 'application/json'
   }
